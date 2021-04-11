@@ -71,6 +71,9 @@
         <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">
     @endif
 
+    <!-- Toastr -->
+    <link rel ="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
 </head>
 
 <body class="@yield('classes_body')" @yield('body_data')>
@@ -100,10 +103,38 @@
             <livewire:scripts />
         @endif
     @endif
-
+<!-- Toastr -->
+<script src ="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
+<script>
+    @if(Session::has('message'))
+    var type ="{{Session::get('alert-type')}}";
+    switch (type){
+        case 'info':
+            toastr.info("{{ Session::get('message') }}");
+        break;
+        case 'success':
+            toastr.success("{{ Session::get('message') }}");
+        break;
+        case 'warning':
+            toastr.warning("{{ Session::get('message') }}");
+        break;
+        case 'error':
+            toastr.error("{{ Session::get('message') }}");
+        break;
+    }
+    @endif
 
+    @if($errors->any())
+        toastr.error("{{ $errors}}");
+    @endif
+
+    $('#table-data').DataTable();
+
+    let baseurl = "<?=url('/')?>";
+    let fullURL = "<?=url()->full()?>";
+</script>
 </body>
 
 </html>
