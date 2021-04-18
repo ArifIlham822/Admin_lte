@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
+use PDF;
 use App\Models\Book;
 
 class AdminController extends Controller
@@ -49,12 +49,40 @@ class AdminController extends Controller
 
         return redirect()->route('admin.books')->with($notification);
     }
-    public function getDataBuku($id)
-    {
-     
-        $buku = Book::find($id);
-        return response()->json($buku);
-    }
+  
+    // public function update_book(Request $req)
+    // {
+    //     $book = Book::find($req->get('id'));
+
+    //     $book->judul = $req->get('judul');
+    //     $book->penulis = $req->get('penulis');
+    //     $book->tahun = $req->get('tahun');
+    //     $book->penerbit = $req->get('penerbit');
+
+    //     if ($req->hasFile('cover')) {
+    //         $extension = $req->file('cover')->extension();
+
+    //         $filename = 'cover_buku_'.time().'.'.$extension;
+
+    //         $req->file('cover')->storeAs(
+    //             'public/cover_buku', $filename
+    //         );
+
+    //         Storage::delete('public/cover_buku/'.$req->get('old_cover'));
+
+    //         $book->cover = $filename;
+    //     }
+
+    //     $book->save();
+
+    //     $notification = array(
+    //         'message' => 'Data buku berhasil diubah',
+    //         'alert-type' => 'success'
+    //     );
+
+    //     return redirect()->route('admin.books')->with($notification);
+
+    // }
     public function update_book(Request $request)
     {
         $book = Book::find($request->get('id'));
@@ -67,8 +95,8 @@ class AdminController extends Controller
             $extension = $request->file('cover')->extension();
             $filename = 'cover_buku_' . time() . '.' . $extension;
             $request->file('cover')->storeAs('public/cover_buku', $filename);
-            storage::delete('public/cover_buku/'.$request->get('old_cover'));
-            $book->cover= $filename;
+            Storage::delete('public/cover_buku/'.$request->get('old_cover'));
+            $book->cover = $filename;
         }
 
         $book->save();
@@ -80,4 +108,33 @@ class AdminController extends Controller
 
         return redirect()->route('admin.books')->with($notification);
     }
+    public function getDataBuku($id)
+    {
+        $buku = Book::find($id);
+
+        return response()->json($buku);
+    }
+
+    public function delete_book(Request $req)
+    {
+        $book = Book::find($req->id);
+        Storage::delete('public/cover_buku/'.$req->get('old_cover'));
+        $book->delete();
+     
+        $notification = array(
+            'message' => 'Data buku berhasil dihapus',
+            'alert-type' => 'success'
+        );
+
+        return redirect()->route('admin.books')->with($notification);
+
+    }
+    public function print_books()
+    {
+        $books = Book::all();
+
+        $pdf = PDF::loadview('print_books', ['books' => $books]);
+        return $pdf->download('data_buku.pdf');
+    }
+    
 }

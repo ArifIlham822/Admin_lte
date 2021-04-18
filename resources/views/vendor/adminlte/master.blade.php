@@ -127,7 +127,7 @@
     @endif
 
     @if($errors->any())
-        toastr.error("{{ $errors}}");
+        toastr.error("{{ $errors }}");
     @endif
 
     $('#table-data').DataTable();
@@ -135,6 +135,4 @@
     let baseurl = "<?=url('/')?>";
     let fullURL = "<?=url()->full()?>";
 </script>
-</body>
-
 </html>

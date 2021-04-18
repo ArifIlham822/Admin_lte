@@ -15,6 +15,8 @@
                 <div class="card-header">{{ __('Pengelolaan Buku') }}</div>
                 <div class="card-body">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#tambahBukuModal"><i class="fa fa-plus"></i>Tambah Data</button>
+                    <a href="{{ route('admin.print.books') }}" target="_blank" class="btn btn-secondary"><i class="fa fa-print"></i> Cetak PDF</a>
+                     
                     </hr>
                      <table id="table-data" class="table table-borderer">
                         <thead>
@@ -45,15 +47,13 @@
                                          @endif
                                         </td>
                                         <td>
-                                            <div class="btn-group" role="group" ariaa-label="Basic example">
-                                                <button type="button" id="btn-edit-buku" class="btn btn-success" data-toggle="modal" data-target="#editBukuModal" data-id="{{$book->id}}">Edit</button>
-
-                                                <button type="button" id="btn-delete-buku" class="btn btn-danger">Hapus</button>
-
+                                            <div class="btn-group" role="group" aria-label="Basic example">
+                                                <button type="button" id="btn-edit-buku" class="btn btn-success" data-toggle="modal" data-target="#editBukuModal" data-id="{{ $book->id }}">Ubah</button>
+                                                <button type="button" id="btn-delete-buku" class="btn btn-danger" data-toggle="modal" data-target="#deleteBukuModal" data-id="{{ $book->id }}" data-cover="{{ $book->cover }}">Hapus</button>
                                             </div>
                                         </td>
-                                </tr>
-                            @endforeach
+                                    </tr>
+                                @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -108,85 +108,129 @@
 {{-- end Modal tambah buku--}}
     
     {{-- Modal edit buku --}}
-    <div class="modal fade" id="editBukuModal" tabindex="-1" aria-labelledby="editBukuLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="POST" action="{{ route('admin.book.update') }}" enctype="multipart/form-data">
-                   @csrf
-                   @method('PATCH')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editBukuLabel">{{ _('Edit Data Buku') }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col">
-                                <input type="hidden" id="editId" name="id">
-                                <input type="hidden" id="editOldCover" name="old_cover">
-                                <div class="form-group">
-                                    <label for="editJudul">Judul Buku</label>
-                                    <input type="text" class="form-control" id="editJudul" name="judul">
-                                </div>
-                                <div class="form-group">
-                                    <label for="editPenulis">Penulis</label>
-                                    <input type="text" class="form-control" id="editPenulis" name="penulis">
-                                </div>
-                                <div class="form-group">
-                                    <label for="editTahun">Tahun</label>
-                                    <input type="number" class="form-control" id="editTahun" name="tahun">
-                                </div>
-                                <div class="form-group">
-                                    <label for="editPenerbit">Penerbit</label>
-                                    <input type="text" class="form-control" id="editPenerbit" name="penerbit">
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div id="image-area" class="pt-3"></div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="editCover">Cover</label>
-                            <input type="file" class="form-control-file" id="editCover" name="cover">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Kirim</button>
-                    </div>
-                </form>
-            </div>
+    <div class="modal fade" id="editBukuModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Edit Data Buku</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <form method="post" action="{{ route('admin.book.update') }}" enctype="multipart/form-data">
+          @csrf
+          @method('PATCH')
+          <div class="row">
+              <div class="col-md-6">
+                  <div class="form-group">
+                      <label for="edit-judul">Judul Buku</label>
+                      <input type="text" class="form-control" name="judul" id="edit-judul" required/>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-penulis">Penulis</label>
+                      <input type="text" class="form-control" name="penulis" id="edit-penulis" required/>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-tahun">Tahun</label>
+                      <input min="1" type="number" id="datepicker" class="form-control" name="tahun" id="edit-tahun" required/>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-penerbit">Penerbit</label>
+                      <input type="text" class="form-control" name="penerbit" id="edit-penerbit" required/>
+                  </div>
+              </div>
+              <div class="col-md-6">
+                  <div class="form-group" id="image-area"></div>
+                  <div class="form-group">
+                      <label for="edit-cover">Cover</label>
+                      <input type="file" class="form-control" name="cover" id="edit-cover"/>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="id" id="edit-id"/>
+          <input type="hidden" name="old_cover" id="edit-old-cover"/>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-success">Update</button>
+          </form>
+        </div>
+      </div>
     </div>
+  </div>
 {{-- end Modal edit buku--}}
+
+<div class="modal fade" id="deleteBukuModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Hapus Data Buku</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        Apakah anda yakin akan menghapus data tersebut?
+          <form method="post" action="{{ route('admin.book.delete') }}" enctype="multipart/form-data">
+              @csrf
+              @method('DELETE')
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="id" id="delete-id" value=""/>
+          <input type="hidden" name="old_cover" id="delete-old-cover"/>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+          <button type="submit" class="btn btn-danger">Hapus</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
 @stop
+
+
+
+
 
 @section('js')
 <script>
     $(function(){
+
+        $(document).on('click', '#btn-delete-buku', function(){
+                let id = $(this).data('id');
+                let cover = $(this).data('cover');
+                $('#delete-id').val(id);
+                $('#delete-old-cover').val(cover);
+                console.log("hallo");
+            });
+
+
+
         $(document).on('click', '#btn-edit-buku', function(){
-            let id = $(this).data('id');
-            $('#image-area').empty();
-            $.ajax({
-                type: "get",
-                url: `${baseUrl}/admin/ajaxadmin/dataBuku/${id}`,
-                dataType: "json",
-                success: function(res){
-                    $('#editjudul').val(res.judul);
-                    $('#editpenerbit').val(res.penerbit);
-                    $('#edittahun').val(res.tahun);
-                    $('#editpenulis').val(res.penulis);
-                    $('#editid').val(res.id);
-                    $('#editoldCover').val(res.cover);
-                    if (res.cover !== null) {
-                        $('#image-area').append(`<img class="img-thumbnail" src="${baseUrl}/storage/cover_buku/${res.cover}" width="200px" />`);
-                    } else {
-                        $('#image-area').append(`[Gambar tidak tersedia]`);
-                    }
-                },
+                let id = $(this).data('id');
+                $('#image-area').empty();
+                $.ajax({
+                    type: "get",
+                    url: baseurl+'/admin/ajaxadmin/dataBuku/'+id,
+                    dataType: 'json',
+                    success: function(res){
+                        $('#edit-judul').val(res.judul);
+                        $('#edit-penerbit').val(res.penerbit);
+                        $('#edit-penulis').val(res.penulis);
+                        $('#edit-tahun').val(res.tahun);
+                        $('#edit-id').val(res.id);
+                        $('#edit-old-cover').val(res.cover);
+                        if (res.cover !== null) {
+                            $('#image-area').append(
+                                "<img src='"+baseurl+"/storage/cover_buku/"+res.cover+"' width='200px'/>"
+                            );
+                        } else {
+                            $('#image-area').append('[Gambar tidak tersedia]');
+                        }
+                    },
+                });
             });
         });
-    });
 </script>
 @stop

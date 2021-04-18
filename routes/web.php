@@ -39,9 +39,12 @@ Route::post('admin/books', [App\Http\Controllers\AdminController::class, 'submit
 Route::patch('admin/books/update', [App\Http\Controllers\AdminController::class, 'update_book'])
     ->name('admin.book.update')
     ->middleware('is_admin');
+Route::get('admin/ajaxadmin/dataBuku/{id}', [App\Http\Controllers\AdminController::class, 'getDataBuku']);
 
+Route::delete('admin/books/delete', [App\Http\Controllers\AdminController::class, 'delete_book'])
+    ->name('admin.book.delete')
+    ->middleware('is_admin');
 
-
-Route::get('/admin/api/dataBuku/{id}', [App\Http\Controllers\AdminController::class, 'getDataBuku'])
-    ->name('api.book')
+    Route::get('admin/print_books', [App\Http\Controllers\AdminController::class, 'print_books'])
+    ->name('admin.print.books')
     ->middleware('is_admin');
